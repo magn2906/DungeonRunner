@@ -11,8 +11,8 @@ namespace DungeonRunner
     {
         public static void highScore(Hero hero)
         {
-            int newHighScore = hero.gold + hero.health + (hero.healthpotions * 100)
-            + (hero.heroLevel * 100);
+            int newHighScore = hero.Gold + hero.Health + (hero.HealthPotions * 100)
+            + (hero.HeroLevel * 100);
             StreamWriter File = new StreamWriter("HighScore.txt");
             File.Write("" + newHighScore);
             File.Close();
@@ -26,26 +26,24 @@ namespace DungeonRunner
             string happened = "";
             ConsoleKeyInfo key = new ConsoleKeyInfo();
 
-            while (key.KeyChar != 'x' && monster.health > 0)
+            while (key.KeyChar != 'x' && monster.Health > 0)
             {
                 Console.Clear();
 
                 Console.WriteLine("\n Hero:");
-                Console.WriteLine(" Health: " + hero.health);
+                Console.WriteLine($" Health: {hero.Health}");
                 Console.WriteLine("\n Monster:");
-                Console.WriteLine(" Health: " + monster.health + "%");
+                Console.WriteLine($" Health: {monster.Health}%");
 
-                Console.WriteLine("\n");
-                Console.WriteLine("" + happened);
-                Console.WriteLine("\n");
+                Console.WriteLine($"\n{happened}\n");
 
                 Console.WriteLine("(F) = Hit Monster");
                 Console.WriteLine("(T) = Cast Spell On Monster");
                 Console.WriteLine("(G) = Steal From Monster");
-                Console.WriteLine("(H) = Drink Health Potion" + " " + hero.healthpotions);
+                Console.WriteLine($"(H) = Drink Health Potion {hero.HealthPotions}");
 
 
-                if (hero.health <= 0)
+                if (hero.Health <= 0)
                 {
                     Console.Clear();
                     break;
@@ -56,45 +54,84 @@ namespace DungeonRunner
                 switch (key.KeyChar)
                 {
                     case 'f':
-                        monster.health -= (int)(hero.strength - monster.armor);
-                        hero.health -= (int)(monster.strength - hero.armor);
-                        happened = "you hit the monster but it hit you back";
+                        if (hero.Strength - monster.Armor >= 0 && monster.Strength - hero.Armor >= 0)
+                        {
+                            monster.Health -= hero.Strength - monster.Armor;
+                            hero.Health -= monster.Strength - hero.Armor;
+                            happened = "You hit the monster but it hit you back";
+                        }
+                        else if (hero.Strength - monster.Armor >= 0 && monster.Strength - hero.Armor < 0)
+                        {
+                            monster.Health -= hero.Strength - monster.Armor;
+                            happened = "You hit the monster and it couldn't damage you back";
+                        }
+                        else if (hero.Strength - monster.Armor < 0 && monster.Strength - hero.Armor >= 0)
+                        {
+                            hero.Health -= monster.Strength - hero.Armor;
+                            happened = "You couldn't hit the monster but the monster hit you";
+                        }
+                        else
+                        {
+                            happened = "You couldn't hit the monster and the monster couldn't hit you";
+                        }
                         break;
                     case 'h':
-                        if (hero.healthpotions >= 1)
+                        if (hero.HealthPotions >= 1)
                         {
-                            happened = "you used a Health Potion. You feel Refreshed";
-                            hero.health += 100;
-                            hero.healthpotions -= 1;
+                            happened = "You used a Health Potion. You feel Refreshed, but the monster hit you";
+                            hero.Health += 100;
+                            hero.HealthPotions -= 1;
+                            hero.Health -= monster.Strength - hero.Armor;
+                        }
+                        else
+                        {
+                            happened = "You don't have any Health Potions, and the monster hit you";
+                            hero.Health -= monster.Strength - hero.Armor;
                         }
                         break;
                     case 'g':
-                        if (monster.gold >= 10)
+                        if (monster.Gold >= 10)
                         {
-                            monster.gold -= (int)(10);
-                            hero.gold += (int)(10);
-                            hero.health -= (int)(monster.strength - hero.armor);
-                            happened = "you tryed to steal from the monster and found some gold but it hit you";
-                            if (monster.gold <= 10)
-                            {
-
-                                happened = "you tryed to steal from the monster but couldent find any gold on it, but it hit you";
-                                hero.health -= (int)(monster.strength - hero.armor);
-
-                            }
+                            monster.Gold -= 10;
+                            hero.Gold += 10;
+                            hero.Health -= monster.Strength - hero.Armor;
+                            happened = "You tried to steal from the monster and found some gold but it hit you";
+                        }
+                        else
+                        {
+                            hero.Health -= monster.Strength - hero.Armor;
+                            happened = "You tried to steal from the monster but couldn't find any gold on it, and it hit you";
                         }
                         break;
                     case 't':
-                        monster.health -= (int)(hero.magic - monster.magicResist);
-                        hero.health -= (int)(monster.strength - hero.armor);
-                        happened = "you cast a spell on the monster and it hit you back";
+                        if (hero.Magic - monster.MagicResist >= 0 && monster.Strength - hero.Armor >= 0)
+                        {
+                            monster.Health -= hero.Magic - monster.MagicResist;
+                            hero.Health -= monster.Strength - hero.Armor;
+                            happened = "You cast a spell on the monster but it hit you back";
+                        }
+                        else if (hero.Magic - monster.MagicResist >= 0 && monster.Strength - hero.Armor < 0)
+                        {
+                            monster.Health -= hero.Magic - monster.MagicResist;
+                            happened = "You cast a spell on the monster and it couldn't damage you back";
+                        }
+                        else if (hero.Magic - monster.MagicResist < 0 && monster.Strength - hero.Armor >= 0)
+                        {
+                            hero.Health -= monster.Strength - hero.Armor;
+                            happened = "You couldn't cast a spell on the monster but the monster hit you";
+                        }
+                        else
+                        {
+                            happened = "You couldn't cast a spell on the monster and the monster couldn't hit you";
+                        }
+                            
                         break;
                 }
                 Console.Clear();
             }
         }
 
-        public static void printMap(int[,] maze, int hX, int hY, Hero hero)
+        public static void PrintMap(int[,] maze, int hX, int hY, Hero hero)
         {
             char c = ' ';
             for (int y = 0; y < maze.GetLength(0); y++)
@@ -111,7 +148,7 @@ namespace DungeonRunner
                         switch (maze[y, x])
                         {
                             case 0: c = ' '; break;
-                            case 1: c = '#'; break;
+                            case 1: c = '|'; break;
                             case 2: c = '@'; break;
                             case 3: c = '%'; break;
                             case 4: c = '*'; break;
@@ -123,11 +160,11 @@ namespace DungeonRunner
                 }
             }
             Console.WriteLine("\n\n");
-            Console.WriteLine("   Options     Level:" + hero.heroLevel);
+            Console.WriteLine("   Options     Level:" + hero.HeroLevel);
             Console.WriteLine("   A = Move Left       D = Move Right");
             Console.WriteLine("   S = Move Down       W = Move Up");
-            Console.Write("   HeroStats: " + "Strenght  " + hero.strength + "   " + "Health  " + hero.health);
-            Console.WriteLine("\n" + "   Gold: " + hero.gold + "   press b to buy a level for 100 Gold");
+            Console.Write("   HeroStats: " + "Strenght  " + hero.Strength + "   " + "Health  " + hero.Health);
+            Console.WriteLine("\n" + "   Gold: " + hero.Gold + "   press b to buy a level for 100 Gold");
             Console.WriteLine("\n " + " ? = player // # = wall // @ = healthpotion // % = key // * = locked door ");
             Console.WriteLine("\n");
             Console.WriteLine("   X To Exit Game");
@@ -135,10 +172,6 @@ namespace DungeonRunner
 
         static void Main(string[] args)
         {
-            // Console.ForegroundColor = ConsoleColor.White;
-            //   Console.ForegroundColor = ConsoleColor.Black; 
-
-
             Hero hero = new Hero();
 
             int heroX = 1;
@@ -167,17 +200,17 @@ namespace DungeonRunner
 
                 if (maze[heroY, heroX] == 2)
                 {
-                    hero.healthpotions += 1;
+                    hero.HealthPotions += 1;
                     maze[heroY, heroX] = 0;
                 }
 
                 if (maze[heroY, heroX] == 3)
                 {
-                    hero.key += 1;
+                    hero.Key += 1;
                     maze[heroY, heroX] = 0;
                 }
 
-                if (maze[heroY, heroX] == 4 && hero.key <= 1)
+                if (maze[heroY, heroX] == 4 && hero.Key <= 1)
                 {
                     Console.Clear();
                     Console.WriteLine("You Won The Game!");
@@ -188,7 +221,7 @@ namespace DungeonRunner
                     Console.ReadLine();
                     break;
                 }
-                if (hero.health <= 0)
+                if (hero.Health <= 0)
                 {
                     Console.Clear();
                     Console.WriteLine("\n The Monster Killed you!");
@@ -198,17 +231,16 @@ namespace DungeonRunner
                     break;
                 }
 
-                printMap(maze, heroX, heroY, hero);
+                PrintMap(maze, heroX, heroY, hero);
                 ConsoleKeyInfo key = Console.ReadKey();
                 if (key.KeyChar == 'w' && maze[heroY - 1, heroX] != 1 && maze[heroY + 1, heroX] != 5) heroY--;
                 if (key.KeyChar == 'a' && maze[heroY, heroX - 1] != 1 && maze[heroY + 1, heroX] != 5) heroX--;
                 if (key.KeyChar == 's' && maze[heroY + 1, heroX] != 1 && maze[heroY + 1, heroX] != 5) heroY++;
                 if (key.KeyChar == 'd' && maze[heroY, heroX + 1] != 1 && maze[heroY + 1, heroX] != 5) heroX++;
-                if (key.KeyChar == 'b' && hero.gold >= 100) { hero.gold -= 100; hero.heroLevel++; hero.UPDATEHERO(); }
+                if (key.KeyChar == 'b' && hero.Gold >= 100) { hero.Gold -= 100; hero.HeroLevel++; hero.UPDATEHERO(); }
 
                 if (key.KeyChar == 'x')
                     break;
-
             }
         }
     }

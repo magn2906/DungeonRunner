@@ -8,32 +8,31 @@ namespace DungeonRunner
 {
     class Hero
     {
-        public int health;
-        public int strength;
-        public int magic;
-        public int armor;
-        public int healthpotions;
-        public int key;
-        public int gold;
-        public int heroLevel;
+        public int Health;
+        public int Strength;
+        public int Magic;
+        public int Armor;
+        public int HealthPotions;
+        public int Key;
+        public int Gold;
+        public int HeroLevel;
 
 
         public void UPDATEHERO()
         {
-            magic = (int)(15) + heroLevel;
-            health = (int)(190) + heroLevel * 10;
-            strength = (int)(19) + heroLevel;
+            Magic = 15 + HeroLevel;
+            Health = 190 + HeroLevel * 10;
+            Strength = 19 + HeroLevel;
         }
 
         public Hero()
         {
+            HeroLevel = 1;
             UPDATEHERO();
 
-
-            armor = 5;
-            healthpotions = 1;
-            gold = 10;
-
+            Armor = 5;
+            HealthPotions = 1;
+            Gold = 10;
         }
 
     }

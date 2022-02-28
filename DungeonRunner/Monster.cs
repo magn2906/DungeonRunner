@@ -8,20 +8,20 @@ namespace DungeonRunner
 {
     class Monster
     {
-        public int health;
-        public int strength;
-        public int armor;
-        public int gold;
-        public int magicResist;
+        public int Health;
+        public int Strength;
+        public int Armor;
+        public int Gold;
+        public int MagicResist;
 
 
         public Monster(int level)
         {
-            health = 100;
-            strength = 1 * level;
-            armor = 2 + level;
-            gold = 10 * level;
-            magicResist = 30 - level * 2;
+            Health = 100;
+            Strength = level;
+            Armor = (level / 5)*3;
+            Gold = 10 * level;
+            MagicResist = level / 3;
         }
     }
 }
